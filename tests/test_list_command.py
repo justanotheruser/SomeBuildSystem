@@ -12,7 +12,7 @@ def test_list_tasks_invalid_input(with_invalid_tasks_file):
     assert re.match(r".*\.yaml has invalid format[\r\n]+", result.output)
 
 
-@pytest.mark.with_file_in_cwd_from_data('tasks/valid_tasks.yaml', 'tasks.yaml')
+@pytest.mark.with_file_in_cwd_from_data("tasks/valid_tasks.yaml", "tasks.yaml")
 def test_list_tasks_command(with_file_in_cwd):
     runner = CliRunner()
     result = runner.invoke(list_command, ["tasks"])
@@ -53,12 +53,14 @@ def test_list_tasks_command(with_file_in_cwd):
     )
 
 
-@pytest.mark.with_file_in_cwd_from_data('builds/valid_builds.yaml', 'builds.yaml')
+@pytest.mark.with_file_in_cwd_from_data("builds/valid_builds.yaml", "builds.yaml")
 def test_list_builds_command(with_file_in_cwd):
     runner = CliRunner()
     result = runner.invoke(list_command, ["builds"])
-    assert result.output == "List of available builds:\n" \
-        " * approach_important\n" \
-        " * audience_stand\n" \
+    assert (
+        result.output == "List of available builds:\n"
+        " * approach_important\n"
+        " * audience_stand\n"
         " * time_alone\n"
+    )
     assert result.exit_code == 0
