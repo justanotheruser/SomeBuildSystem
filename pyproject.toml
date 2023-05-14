@@ -1,0 +1,11 @@
+[project]
+name = "build_task_manager"
+version = "0.1"
+description = "CLI-utility script for determining correct order of tasks for build"
+
+[build-system]
+requires = ["setuptools >= 61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tools.setuptools.packages.find]
+where = ["src"]
