@@ -1,11 +1,22 @@
+import pytest
 from click.testing import CliRunner
+import re
 
 from build_task_manager.app import list_command
 
 
-def test_list_tasks_command(tasks_yaml_in_cwd):
+def test_list_tasks_invalid_input(with_invalid_tasks_file):
     runner = CliRunner()
     result = runner.invoke(list_command, ["tasks"])
+    assert result.exit_code == 1
+    assert re.match(r".*\.yaml has invalid format[\r\n]+", result.output)
+
+
+@pytest.mark.with_tasks_file_named("valid_tasks.yaml")
+def test_list_tasks_command(with_tasks_file):
+    runner = CliRunner()
+    result = runner.invoke(list_command, ["tasks"])
+    assert result.exit_code == 0
     assert (
         result.output == "List of available tasks:\n"
         " * bring_black_leprechauns\n"
@@ -40,7 +51,6 @@ def test_list_tasks_command(tasks_yaml_in_cwd):
         " * write_aqua_leprechauns\n"
         " * write_lime_leprechauns\n"
     )
-    assert result.exit_code == 0
 
 
 def test_list_builds_command():

@@ -1,4 +1,5 @@
 import logging
+import sys
 
 import click
 
@@ -25,7 +26,7 @@ def list_tasks_command(**kwargs):
         tasks = read_tasks()
     except RuntimeError as e:
         click.echo(e)
-        return
+        sys.exit(1)
     click.echo("List of available tasks:")
     for task in tasks:
         click.echo(f' * {task["name"]}')
