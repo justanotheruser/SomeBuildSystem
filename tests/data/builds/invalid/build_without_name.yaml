@@ -1,0 +1,3 @@
+builds:
+- tasks:
+  - map_gray_centaurs
