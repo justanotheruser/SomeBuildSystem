@@ -10,10 +10,22 @@ def cli():
     pass
 
 
-@click.command(name="list")
+@cli.group(name="list")
 def list_command(**kwargs):
     """Show names of loaded builds/tasks"""
     pass
+
+
+@list_command.command(name="tasks")
+def list_tasks(**kwargs):
+    """Show names of loaded tasks"""
+    click.echo("List of available tasks:")
+
+
+@list_command.command(name="builds")
+def list_builds(**kwargs):
+    """Show names of loaded builds"""
+    click.echo("List of available builds:")
 
 
 def setup_file_logger():
