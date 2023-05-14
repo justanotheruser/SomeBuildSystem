@@ -8,8 +8,10 @@ click = "*"
 flake8 = "*"
 mypy = "*"
 pytest = "*"
+black = "*"
 
 [dev-packages]
+build-task-manager = {editable = true, path = "."}
 
 [requires]
 python_version = "3.10"

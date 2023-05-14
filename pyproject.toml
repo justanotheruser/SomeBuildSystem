@@ -9,3 +9,6 @@ build-backend = "setuptools.build_meta"
 
 [tools.setuptools.packages.find]
 where = ["src"]
+
+[tool.mypy]
+files = ['src']
