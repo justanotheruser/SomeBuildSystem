@@ -4,6 +4,7 @@ import sys
 import click
 
 from build_task_manager.tasks import read_tasks
+from build_task_manager.builds import read_builds
 
 logger = logging.getLogger("BuildTaskManager")
 
@@ -35,7 +36,14 @@ def list_tasks_command(**kwargs):
 @list_command.command(name="builds")
 def list_builds_command(**kwargs):
     """Show names of loaded builds"""
+    try:
+        tasks = read_builds()
+    except RuntimeError as e:
+        click.echo(e)
+        sys.exit(1)
     click.echo("List of available builds:")
+    for task in tasks:
+        click.echo(f' * {task["name"]}')
 
 
 def setup_file_logger():

@@ -19,11 +19,11 @@ def with_invalid_tasks_file(request):
 
 
 @pytest.fixture()
-def with_tasks_file(request):
-    marker = request.node.get_closest_marker("with_tasks_file_named")
-    tasks_file_name = marker.args[0]
-    src = f"tests/data/tasks/{tasks_file_name}"
-    dst = os.path.join(os.getcwd(), "tasks.yaml")
+def with_file_in_cwd(request):
+    marker = request.node.get_closest_marker("with_file_in_cwd_from_data")
+    src_file_path, dst_file_name = marker.args[0], marker.args[1]
+    src = f"tests/data/{src_file_path}"
+    dst = os.path.join(os.getcwd(), dst_file_name)
     shutil.copyfile(src, dst)
     yield
     os.remove(dst)
