@@ -9,6 +9,9 @@ flake8 = "*"
 mypy = "*"
 pytest = "*"
 black = "*"
+pyyaml = "*"
+schema = "*"
+types-pyyaml = "*"
 
 [dev-packages]
 build-task-manager = {editable = true, path = "."}

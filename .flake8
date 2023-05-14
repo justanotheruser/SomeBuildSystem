@@ -6,3 +6,6 @@ exclude =
     __pycache__
     build
     dist
+
+# Ignore 'line too long'
+ignore = E501
