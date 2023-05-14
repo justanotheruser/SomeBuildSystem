@@ -26,6 +26,7 @@ def list_tasks_command(**kwargs):
     try:
         tasks = read_tasks()
     except RuntimeError as e:
+        logger.error(e)
         click.echo(e)
         sys.exit(1)
     click.echo("List of available tasks:")
@@ -39,6 +40,7 @@ def list_builds_command(**kwargs):
     try:
         tasks = read_builds()
     except RuntimeError as e:
+        logger.error(e)
         click.echo(e)
         sys.exit(1)
     click.echo("List of available builds:")
@@ -48,8 +50,29 @@ def list_builds_command(**kwargs):
 
 @cli.group(name="get")
 def get_command(**kwargs):
-    """Show detailed information about builds/tasks"""
+    """Show detailed information about build/task"""
     pass
+
+
+@get_command.command(name="task")
+@click.argument("task_name")
+def get_task_command(task_name):
+    """Show information about task and its dependencies"""
+    try:
+        tasks = read_tasks()
+    except RuntimeError as e:
+        logger.error(e)
+        click.echo(e)
+        sys.exit(1)
+    if not (task := tasks.get_task(task_name)):
+        warning_message = f"No such task: {task_name}"
+        logger.warning(warning_message)
+        click.echo(warning_message)
+        sys.exit(1)
+    dependencies = ", ".join(task.dependencies)
+    click.echo(
+        "Task info:\n" f"* name: {task_name}\n" f"* dependencies: {dependencies}"
+    )
 
 
 def setup_file_logger():

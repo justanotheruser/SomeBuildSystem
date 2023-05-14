@@ -23,7 +23,7 @@ class Tasks:
     def add(self, task_dict: dict):
         task_name = task_dict["name"]
         self.tasks[task_name] = Task(
-            name=task_name, dependencies=task_dict["dependencies"]
+            name=task_name, dependencies=sorted(task_dict["dependencies"])
         )
 
     def find_missing_tasks(self) -> dict[str, list[str]]:
@@ -40,6 +40,12 @@ class Tasks:
     def list_tasks(self) -> list[str]:
         """Returns sorted list of task names"""
         return sorted(self.tasks.keys())
+
+    def get_task(self, name: str) -> typing.Optional[Task]:
+        """Return task if it exists or None otherwise"""
+        if name not in self.tasks.keys():
+            return None
+        return self.tasks[name]
 
 
 def read_tasks() -> Tasks:
