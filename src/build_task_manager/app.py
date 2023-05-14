@@ -29,8 +29,8 @@ def list_tasks_command(**kwargs):
         click.echo(e)
         sys.exit(1)
     click.echo("List of available tasks:")
-    for task in tasks:
-        click.echo(f' * {task["name"]}')
+    for task_name in tasks.list_tasks():
+        click.echo(f" * {task_name}")
 
 
 @list_command.command(name="builds")
@@ -44,6 +44,12 @@ def list_builds_command(**kwargs):
     click.echo("List of available builds:")
     for task in tasks:
         click.echo(f' * {task["name"]}')
+
+
+@cli.group(name="get")
+def get_command(**kwargs):
+    """Show detailed information about builds/tasks"""
+    pass
 
 
 def setup_file_logger():

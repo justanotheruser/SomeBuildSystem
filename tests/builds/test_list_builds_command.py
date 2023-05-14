@@ -5,7 +5,7 @@ import re
 from build_task_manager.app import list_command
 
 
-def test_list_builds_invalid_input(with_invalid_builds_file):
+def test_list_builds_invalid_input(with_invalid_schema_builds_file):
     runner = CliRunner()
     result = runner.invoke(list_command, ["builds"])
     assert result.exit_code == 1

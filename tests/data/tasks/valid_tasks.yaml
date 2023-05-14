@@ -1,4 +1,18 @@
 tasks:
+- name: coloring_green_cyclops
+  dependencies:
+  - bring_gray_cyclops
+  - enable_white_cyclops
+  - read_lime_cyclops
+- name: create_green_cyclops
+  dependencies:
+  - bring_green_cyclops
+  - design_silver_cyclops
+  - enable_yellow_cyclops
+  - read_aqua_cyclops
+  - train_white_cyclops
+- name: create_white_cyclops
+  dependencies: []
 - name: bring_black_leprechauns
   dependencies: []
 - name: bring_gray_cyclops
@@ -14,19 +28,7 @@ tasks:
   - bring_purple_leprechauns
 - name: build_lime_cyclops
   dependencies: []
-- name: coloring_green_cyclops
-  dependencies:
-  - bring_gray_cyclops
-  - enable_white_cyclops
-  - read_lime_cyclops
-- name: create_green_cyclops
-  dependencies:
-  - bring_green_cyclops
-  - design_silver_cyclops
-  - enable_yellow_cyclops
-  - read_aqua_cyclops
-  - train_white_cyclops
-- name: create_white_cyclops
+- name: enable_fuchsia_fairies
   dependencies: []
 - name: design_black_centaurs
   dependencies: []
@@ -39,12 +41,10 @@ tasks:
   dependencies: []
 - name: design_teal_cyclops
   dependencies:
-  - bring_yellow_cyclops
   - build_lime_cyclops
-  - create_white_cyclops
   - map_black_cyclops
-- name: enable_fuchsia_fairies
-  dependencies: []
+  - bring_yellow_cyclops
+  - create_white_cyclops
 - name: enable_white_cyclops
   dependencies: []
 - name: enable_yellow_cyclops

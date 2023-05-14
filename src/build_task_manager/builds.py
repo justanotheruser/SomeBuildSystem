@@ -15,7 +15,7 @@ def read_builds() -> list[dict[str, typing.Union[str, list[str]]]]:
     return builds["builds"]
 
 
-def read_builds_yaml(builds_file):
+def read_builds_yaml(builds_file: str):
     with open(builds_file, "r", encoding="utf-8") as f:
         builds = yaml.load(f, Loader=yaml.FullLoader)
         try:
