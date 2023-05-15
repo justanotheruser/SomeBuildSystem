@@ -12,6 +12,7 @@ black = "*"
 pyyaml = "*"
 schema = "*"
 types-pyyaml = "*"
+coverage = "*"
 
 [dev-packages]
 build-task-manager = {editable = true, path = "."}
