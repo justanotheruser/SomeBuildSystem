@@ -3,8 +3,12 @@ import sys
 
 import click
 
-from build_task_manager.tasks import read_tasks
 from build_task_manager.builds import read_builds
+from build_task_manager.tasks import read_tasks
+from build_task_manager.dependency_cycle_finder import (
+    DependencyCycleFinder,
+    DependencyNotFoundError,
+)
 
 logger = logging.getLogger("BuildTaskManager")
 
@@ -38,14 +42,14 @@ def list_tasks_command(**kwargs):
 def list_builds_command(**kwargs):
     """Show names of loaded builds"""
     try:
-        tasks = read_builds()
+        builds = read_builds()
     except RuntimeError as e:
         logger.error(e)
         click.echo(e)
         sys.exit(1)
     click.echo("List of available builds:")
-    for task in tasks:
-        click.echo(f' * {task["name"]}')
+    for build_name in builds.keys():
+        click.echo(f" * {build_name}")
 
 
 @cli.group(name="get")
@@ -75,6 +79,54 @@ def get_task_command(task_name):
     )
 
 
+# TODO: test for duplicated (ambigous) names in tasks/builds
+@get_command.command(name="build")
+@click.argument("build_name")
+def get_build_command(build_name):
+    """Show information about build and its dependencies"""
+    try:
+        builds = read_builds()
+    except RuntimeError as e:
+        logger.error(e)
+        click.echo(e)
+        sys.exit(1)
+    if build_name not in builds.keys():
+        warning_message = f"No such build: {build_name}"
+        logger.warning(warning_message)
+        click.echo(warning_message)
+        sys.exit(1)
+    try:
+        tasks = read_tasks()
+    except RuntimeError as e:
+        logger.error(e)
+        click.echo(e)
+        sys.exit(1)
+    cycle_finder = DependencyCycleFinder(builds[build_name]["tasks"], tasks)
+    try:
+        dependency_cycle = cycle_finder.find_cycle()
+    except DependencyNotFoundError as e:
+        error_msg = (
+            f"{e.dependency} task is required by build but its definition not found"
+        )
+        logger.error(e)
+        click.echo(error_msg)
+        sys.exit(1)
+    if dependency_cycle:
+        cycle_visualization = " -> ".join(dependency_cycle)
+        click.echo(f"Build has dependency cycle: {cycle_visualization}")
+        sys.exit(1)
+    cycle_finder.get_dependencies()
+    """if not (build_name := tasks.get_task(build_name)):
+        warning_message = f"No such build: {build_name}"
+        logger.warning(warning_message)
+        click.echo(warning_message)
+        sys.exit(1)
+    dependencies = ", ".join(task.dependencies)
+    click.echo(
+        "Task info:\n" f"* name: {task_name}\n" f"* dependencies: {dependencies}"
+    )"""
+
+
 def setup_file_logger():
     ch = logging.FileHandler("BuildTaskManager.log", encoding="utf-8")
     ch.setLevel(logging.INFO)
@@ -88,7 +140,6 @@ def setup_file_logger():
 def main():
     logger.setLevel(logging.INFO)
     setup_file_logger()
-    cli.add_command(list_command)
     cli()
 
 

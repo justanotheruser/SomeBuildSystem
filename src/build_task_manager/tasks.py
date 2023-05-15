@@ -47,6 +47,9 @@ class Tasks:
             return None
         return self.tasks[name]
 
+    def get_all_tasks(self) -> dict[str, Task]:
+        return self.tasks
+
 
 def read_tasks() -> Tasks:
     tasks_file = "tasks.yaml"
