@@ -7,5 +7,5 @@ exclude =
     build
     dist
 
-# Ignore 'line too long'
-ignore = E501
+# Ignore 'line too long', 'line break before binary operator'
+ignore = E501, W503

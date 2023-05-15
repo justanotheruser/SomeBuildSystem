@@ -27,7 +27,24 @@ def test_tasks_file_not_found(with_file_in_cwd):
     runner = CliRunner()
     result = runner.invoke(get_command, ["build", "approach_important"])
     assert result.exit_code == 1
-    assert re.match("Could not open tasks file\n", result.output)
+    assert "Could not open tasks file\n" == result.output
+
+
+@pytest.mark.with_file_in_cwd_from_data(
+    [
+        "builds/build_with_missing_dependency.yaml",
+        "tasks/build_with_missing_dependency_tasks.yaml",
+    ],
+    ["builds.yaml", "tasks.yaml"],
+)
+def test_dependency_not_found(with_file_in_cwd):
+    runner = CliRunner()
+    result = runner.invoke(get_command, ["build", "build_with_missing_dependency"])
+    assert result.exit_code == 1
+    assert (
+        result.output
+        == "task_c task is required by build but its definition not found\n"
+    )
 
 
 """

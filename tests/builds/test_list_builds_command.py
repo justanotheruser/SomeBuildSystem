@@ -20,7 +20,7 @@ def test_list_builds_invalid_input(with_invalid_schema_builds_file):
 
 
 @pytest.mark.with_file_in_cwd_from_data("builds/valid_builds.yaml", "builds.yaml")
-def test_list_builds_command(with_file_in_cwd):
+def test_valid_build(with_file_in_cwd):
     runner = CliRunner()
     result = runner.invoke(list_command, ["builds"])
     assert (

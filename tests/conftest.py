@@ -1,6 +1,7 @@
 import os
 import shutil
 from contextlib import contextmanager
+
 import pytest
 
 
@@ -13,7 +14,7 @@ import pytest
     ]
 )
 def with_invalid_schema_tasks_file(request):
-    with data_file_in_cwd(request.param, "tasks.yaml"):
+    with data_file_in_cwd([request.param], ["tasks.yaml"]):
         yield
 
 
@@ -24,20 +25,26 @@ def with_invalid_schema_tasks_file(request):
     ]
 )
 def with_invalid_schema_builds_file(request):
-    with data_file_in_cwd(request.param, "builds.yaml"):
+    with data_file_in_cwd([request.param], ["builds.yaml"]):
         yield
 
 
 @pytest.fixture()
 def with_file_in_cwd(request):
     marker = request.node.get_closest_marker("with_file_in_cwd_from_data")
-    with data_file_in_cwd(marker.args[0], marker.args[1]):
-        yield
+    if isinstance(marker.args[0], str):
+        with data_file_in_cwd([marker.args[0]], [marker.args[1]]):
+            yield
+    else:
+        with data_file_in_cwd(marker.args[0], marker.args[1]):
+            yield
 
 
 @contextmanager
-def data_file_in_cwd(src_file_path, dst_file_name):
-    src = f"tests/data/{src_file_path}"
-    shutil.copyfile(src, dst_file_name)
+def data_file_in_cwd(src_file_path_list: list[str], dst_file_name_list: list[str]):
+    for src_file_path, dst_file_name in zip(src_file_path_list, dst_file_name_list):
+        src = f"tests/data/{src_file_path}"
+        shutil.copyfile(src, dst_file_name)
     yield
-    os.remove(dst_file_name)
+    for dst_file_name in dst_file_name_list:
+        os.remove(dst_file_name)

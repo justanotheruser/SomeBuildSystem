@@ -93,7 +93,13 @@ def get_build_command(build_name):
         click.echo(warning_message)
         sys.exit(1)
     tasks = read_tasks()
-    cycle_finder = DependencyCycleFinder(builds[build_name]["tasks"], tasks)
+    try:
+        task_storage = TaskStorage(tasks)
+    except RuntimeError as e:
+        logger.error(e)
+        click.echo(e)
+        sys.exit(1)
+    cycle_finder = DependencyCycleFinder(builds[build_name]["tasks"], task_storage)
     try:
         dependency_cycle = cycle_finder.find_cycle()
     except DependencyNotFoundError as e:

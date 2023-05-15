@@ -1,0 +1,5 @@
+builds:
+- name: build_with_missing_dependency
+  tasks:
+  - task_d
+  - task_b
