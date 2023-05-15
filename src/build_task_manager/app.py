@@ -19,6 +19,26 @@ def cli():
     pass
 
 
+@cli.group(name="validate")
+def validate_command(**kwargs):
+    """Check builds/tasks for correct definitions and missing dependencies"""
+    pass
+
+
+@validate_command.command(name="tasks")
+def validate_tasks_command(**kwargs):
+    """Check tasks for correct definitions and missing dependencies"""
+    tasks = read_tasks()
+    try:
+        task_storage = TaskStorage(tasks)
+        task_storage.validate()
+    except RuntimeError as e:
+        logger.error(e)
+        click.echo(e)
+        sys.exit(1)
+    click.echo("OK")
+
+
 @cli.group(name="list")
 def list_command(**kwargs):
     """Show names of loaded builds/tasks"""

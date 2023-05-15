@@ -19,11 +19,6 @@ class TaskStorage:
         self.tasks: dict[str, Task] = dict()
         for task_dict in tasks_list:
             self.add(task_dict)
-        # TODO: add 'validate' command
-        """if missing_tasks := tasks.find_missing_tasks():
-            error_msg = get_missing_tasks_error_message(missing_tasks)
-            logger.error(error_msg)
-            raise RuntimeError(error_msg)"""
 
     def add(self, task_dict: TaskDict):
         task_name: str = task_dict["name"]  # type: ignore
@@ -32,6 +27,12 @@ class TaskStorage:
         self.tasks[task_name] = Task(
             name=task_name, dependencies=sorted(task_dict["dependencies"])
         )
+
+    def validate(self):
+        if missing_tasks := self.find_missing_tasks():
+            error_msg = get_missing_tasks_error_message(missing_tasks)
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)
 
     def find_missing_tasks(self) -> dict[str, list[str]]:
         """Returns dictionary that maps missing tasks to list of tasks which declared them as a dependency."""
