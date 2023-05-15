@@ -18,7 +18,7 @@ class DependencyCycleFinder:
         self.visited = set()
         self.recursion_path_stack = []
         self.recursion_path_set = set()
-        # This is so we don't miss cycles where build tasks depend on each other
+        # This is so we don't have to deal with a forest - it's a single tree now
         self.tasks[self.build_task_name] = Task(
             name=self.build_task_name, dependencies=self.build_tasks
         )
