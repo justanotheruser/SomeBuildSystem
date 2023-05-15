@@ -6,6 +6,13 @@ from click.testing import CliRunner
 from build_task_manager.app import list_command
 
 
+def test_tasks_file_not_found():
+    runner = CliRunner()
+    result = runner.invoke(list_command, ["tasks"])
+    assert result.exit_code == 1
+    assert result.output == "Could not open tasks file\n"
+
+
 def test_invalid_input(with_invalid_schema_tasks_file):
     runner = CliRunner()
     result = runner.invoke(list_command, ["tasks"])

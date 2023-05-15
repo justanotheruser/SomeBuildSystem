@@ -6,6 +6,13 @@ from click.testing import CliRunner
 from build_task_manager.app import get_command
 
 
+def test_tasks_file_not_found():
+    runner = CliRunner()
+    result = runner.invoke(get_command, ["task", "design_teal_cyclops"])
+    assert result.exit_code == 1
+    assert result.output == "Could not open tasks file\n"
+
+
 @pytest.mark.with_file_in_cwd_from_data("tasks/valid_tasks.yaml", "tasks.yaml")
 def test_task_not_found(with_file_in_cwd):
     runner = CliRunner()

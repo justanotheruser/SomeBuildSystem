@@ -5,6 +5,13 @@ import re
 from build_task_manager.app import list_command
 
 
+def test_builds_file_not_found():
+    runner = CliRunner()
+    result = runner.invoke(list_command, ["builds"])
+    assert result.exit_code == 1
+    assert result.output == "Could not open builds file\n"
+
+
 def test_list_builds_invalid_input(with_invalid_schema_builds_file):
     runner = CliRunner()
     result = runner.invoke(list_command, ["builds"])

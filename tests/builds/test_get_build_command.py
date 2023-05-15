@@ -6,6 +6,13 @@ from click.testing import CliRunner
 from build_task_manager.app import get_command
 
 
+def test_builds_file_not_found():
+    runner = CliRunner()
+    result = runner.invoke(get_command, ["build", "approach_important"])
+    assert result.exit_code == 1
+    assert re.match("Could not open builds file\n", result.output)
+
+
 @pytest.mark.with_file_in_cwd_from_data("builds/valid_builds.yaml", "builds.yaml")
 def test_build_not_found(with_file_in_cwd):
     runner = CliRunner()
@@ -13,6 +20,14 @@ def test_build_not_found(with_file_in_cwd):
     result = runner.invoke(get_command, ["build", unknown_task_name])
     assert result.exit_code == 1
     assert re.match(f"No such build: {unknown_task_name}\n", result.output)
+
+
+@pytest.mark.with_file_in_cwd_from_data("builds/valid_builds.yaml", "builds.yaml")
+def test_tasks_file_not_found(with_file_in_cwd):
+    runner = CliRunner()
+    result = runner.invoke(get_command, ["build", "approach_important"])
+    assert result.exit_code == 1
+    assert re.match("Could not open tasks file\n", result.output)
 
 
 """

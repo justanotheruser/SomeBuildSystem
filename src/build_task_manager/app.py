@@ -29,6 +29,10 @@ def list_tasks_command(**kwargs):
     """Show names of loaded tasks"""
     try:
         tasks = read_tasks()
+    except OSError as e:
+        logger.error(e)
+        click.echo("Could not open tasks file")
+        sys.exit(1)
     except RuntimeError as e:
         logger.error(e)
         click.echo(e)
@@ -43,6 +47,10 @@ def list_builds_command(**kwargs):
     """Show names of loaded builds"""
     try:
         builds = read_builds()
+    except OSError as e:
+        logger.error(e)
+        click.echo("Could not open builds file")
+        sys.exit(1)
     except RuntimeError as e:
         logger.error(e)
         click.echo(e)
@@ -64,6 +72,10 @@ def get_task_command(task_name):
     """Show information about task and its dependencies"""
     try:
         tasks = read_tasks()
+    except OSError as e:
+        logger.error(e)
+        click.echo("Could not open tasks file")
+        sys.exit(1)
     except RuntimeError as e:
         logger.error(e)
         click.echo(e)
@@ -86,6 +98,10 @@ def get_build_command(build_name):
     """Show information about build and its dependencies"""
     try:
         builds = read_builds()
+    except OSError as e:
+        logger.error(e)
+        click.echo("Could not open builds file")
+        sys.exit(1)
     except RuntimeError as e:
         logger.error(e)
         click.echo(e)
@@ -97,6 +113,10 @@ def get_build_command(build_name):
         sys.exit(1)
     try:
         tasks = read_tasks()
+    except OSError as e:
+        logger.error(e)
+        click.echo("Could not open tasks file")
+        sys.exit(1)
     except RuntimeError as e:
         logger.error(e)
         click.echo(e)
