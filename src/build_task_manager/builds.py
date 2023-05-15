@@ -1,11 +1,13 @@
 import logging
+import sys
 import typing
 from dataclasses import dataclass
 
+import click
 import yaml
 from schema import Schema, SchemaError, Or  # type: ignore
 
-from build_task_manager.tasks import Task, Tasks
+from build_task_manager.tasks.task_storage import Task, TaskStorage
 
 logger = logging.getLogger("BuildTaskManager")
 
@@ -21,7 +23,16 @@ class Build:
 def read_builds() -> dict[str, dict[str, typing.Union[str, list[str]]]]:
     """Returns dictionary of builds by name"""
     builds_file = "builds.yaml"
-    build_list = read_builds_yaml(builds_file)
+    try:
+        build_list = read_builds_yaml(builds_file)
+    except OSError as e:
+        logger.error(e)
+        click.echo("Could not open builds file")
+        sys.exit(1)
+    except RuntimeError as e:
+        logger.error(e)
+        click.echo(e)
+        sys.exit(1)
     builds: dict[str, dict[str, typing.Union[str, list[str]]]] = dict()
     for build in build_list:
         builds[build["name"]] = build  # type: ignore
@@ -39,5 +50,5 @@ def read_builds_yaml(builds_file: str) -> list[dict[str, typing.Union[str, list[
     return builds["builds"]
 
 
-def get_build(build_name: str, tasks: Tasks):
+def get_build(build_name: str, tasks: TaskStorage):
     pass

@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from build_task_manager.tasks import Task, Tasks
+from build_task_manager.tasks.task_storage import Task, TaskStorage
 
 
 class DependencyNotFoundError(Exception):
@@ -9,7 +9,7 @@ class DependencyNotFoundError(Exception):
 
 
 class DependencyCycleFinder:
-    def __init__(self, build_tasks: list[str], tasks: Tasks):
+    def __init__(self, build_tasks: list[str], tasks: TaskStorage):
         self.build_tasks = build_tasks
         self.tasks = tasks.get_all_tasks()
         self.build_task_name = str(uuid4())

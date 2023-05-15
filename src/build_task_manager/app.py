@@ -4,11 +4,12 @@ import sys
 import click
 
 from build_task_manager.builds import read_builds
-from build_task_manager.tasks import read_tasks
 from build_task_manager.dependency_cycle_finder import (
     DependencyCycleFinder,
     DependencyNotFoundError,
 )
+from build_task_manager.tasks.reading import read_tasks
+from build_task_manager.tasks.task_storage import TaskStorage
 
 logger = logging.getLogger("BuildTaskManager")
 
@@ -27,34 +28,22 @@ def list_command(**kwargs):
 @list_command.command(name="tasks")
 def list_tasks_command(**kwargs):
     """Show names of loaded tasks"""
+    tasks = read_tasks()
     try:
-        tasks = read_tasks()
-    except OSError as e:
-        logger.error(e)
-        click.echo("Could not open tasks file")
-        sys.exit(1)
+        task_storage = TaskStorage(tasks)
     except RuntimeError as e:
         logger.error(e)
         click.echo(e)
         sys.exit(1)
     click.echo("List of available tasks:")
-    for task_name in tasks.list_tasks():
+    for task_name in task_storage.list_tasks():
         click.echo(f" * {task_name}")
 
 
 @list_command.command(name="builds")
 def list_builds_command(**kwargs):
     """Show names of loaded builds"""
-    try:
-        builds = read_builds()
-    except OSError as e:
-        logger.error(e)
-        click.echo("Could not open builds file")
-        sys.exit(1)
-    except RuntimeError as e:
-        logger.error(e)
-        click.echo(e)
-        sys.exit(1)
+    builds = read_builds()
     click.echo("List of available builds:")
     for build_name in builds.keys():
         click.echo(f" * {build_name}")
@@ -70,57 +59,40 @@ def get_command(**kwargs):
 @click.argument("task_name")
 def get_task_command(task_name):
     """Show information about task and its dependencies"""
-    try:
-        tasks = read_tasks()
-    except OSError as e:
-        logger.error(e)
-        click.echo("Could not open tasks file")
+    tasks = read_tasks()
+    # We don't use TaskStorage because we want to display info about task even if there's some other tasks which are
+    # invalid (e.g. duplicated)
+    found_task_dict = None
+    for task_dict in tasks:
+        if task_dict["name"] == task_name:
+            if found_task_dict:
+                error_message = f"Multiple definitions for task {task_name} are found"
+                logger.error(error_message)
+                click.echo(error_message)
+                sys.exit(1)
+            found_task_dict = task_dict
+    if not found_task_dict:
+        error_message = f"No such task: {task_name}"
+        logger.error(error_message)
+        click.echo(error_message)
         sys.exit(1)
-    except RuntimeError as e:
-        logger.error(e)
-        click.echo(e)
-        sys.exit(1)
-    if not (task := tasks.get_task(task_name)):
-        warning_message = f"No such task: {task_name}"
-        logger.warning(warning_message)
-        click.echo(warning_message)
-        sys.exit(1)
-    dependencies = ", ".join(task.dependencies)
+    dependencies = ", ".join(sorted(found_task_dict["dependencies"]))
     click.echo(
         "Task info:\n" f"* name: {task_name}\n" f"* dependencies: {dependencies}"
     )
 
 
-# TODO: test for duplicated (ambigous) names in tasks/builds
 @get_command.command(name="build")
 @click.argument("build_name")
 def get_build_command(build_name):
     """Show information about build and its dependencies"""
-    try:
-        builds = read_builds()
-    except OSError as e:
-        logger.error(e)
-        click.echo("Could not open builds file")
-        sys.exit(1)
-    except RuntimeError as e:
-        logger.error(e)
-        click.echo(e)
-        sys.exit(1)
+    builds = read_builds()
     if build_name not in builds.keys():
         warning_message = f"No such build: {build_name}"
         logger.warning(warning_message)
         click.echo(warning_message)
         sys.exit(1)
-    try:
-        tasks = read_tasks()
-    except OSError as e:
-        logger.error(e)
-        click.echo("Could not open tasks file")
-        sys.exit(1)
-    except RuntimeError as e:
-        logger.error(e)
-        click.echo(e)
-        sys.exit(1)
+    tasks = read_tasks()
     cycle_finder = DependencyCycleFinder(builds[build_name]["tasks"], tasks)
     try:
         dependency_cycle = cycle_finder.find_cycle()

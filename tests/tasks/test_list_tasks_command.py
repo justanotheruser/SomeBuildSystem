@@ -61,7 +61,17 @@ def test_valid_input(with_file_in_cwd):
     )
 
 
-@pytest.mark.with_file_in_cwd_from_data("tasks/missing_tasks.yaml", "tasks.yaml")
+@pytest.mark.with_file_in_cwd_from_data(
+    "tasks/multiple_definitions_for_task.yaml", "tasks.yaml"
+)
+def test_multiple_definitions_for_task(with_file_in_cwd):
+    runner = CliRunner()
+    result = runner.invoke(list_command, ["tasks"])
+    assert result.exit_code == 1
+    assert result.output == "Multiple definitions for task task_a are found\n"
+
+
+"""@pytest.mark.with_file_in_cwd_from_data("tasks/missing_tasks.yaml", "tasks.yaml")
 def test_missing_tasks(with_file_in_cwd):
     runner = CliRunner()
     result = runner.invoke(list_command, ["tasks"])
@@ -73,3 +83,4 @@ def test_missing_tasks(with_file_in_cwd):
         " * task_l: task_d depends on it\n"
         " * task_m: task_d depends on it\n"
     )
+"""

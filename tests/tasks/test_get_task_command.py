@@ -32,3 +32,19 @@ def test_get_existing_task(with_file_in_cwd):
         "* name: design_teal_cyclops\n"
         "* dependencies: bring_yellow_cyclops, build_lime_cyclops, create_white_cyclops, map_black_cyclops\n"
     )
+
+
+@pytest.mark.with_file_in_cwd_from_data(
+    "tasks/multiple_definitions_for_task.yaml", "tasks.yaml"
+)
+def test_get_correctly_defined_task_ignore_multiple_definitions_of_another(
+    with_file_in_cwd,
+):
+    runner = CliRunner()
+    result = runner.invoke(get_command, ["task", "task_b"])
+    assert result.exit_code == 0
+    assert (
+        result.output == "Task info:\n"
+        "* name: task_b\n"
+        "* dependencies: task_c, task_d\n"
+    )

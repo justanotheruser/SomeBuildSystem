@@ -2,12 +2,10 @@ import logging
 import typing
 from dataclasses import dataclass
 
-import yaml
-from schema import Schema, SchemaError, Or  # type: ignore
+
+from build_task_manager.tasks.reading import TaskDict
 
 logger = logging.getLogger("BuildTaskManager")
-
-tasks_schema = Schema({"tasks": [{"name": str, "dependencies": Or(list[str], [])}]})
 
 
 @dataclass
@@ -16,12 +14,21 @@ class Task:
     dependencies: list[str]
 
 
-class Tasks:
-    def __init__(self):
-        self.tasks = dict()
+class TaskStorage:
+    def __init__(self, tasks_list: list[TaskDict]):
+        self.tasks: dict[str, Task] = dict()
+        for task_dict in tasks_list:
+            self.add(task_dict)
+        # TODO: add 'validate' command
+        """if missing_tasks := tasks.find_missing_tasks():
+            error_msg = get_missing_tasks_error_message(missing_tasks)
+            logger.error(error_msg)
+            raise RuntimeError(error_msg)"""
 
-    def add(self, task_dict: dict):
-        task_name = task_dict["name"]
+    def add(self, task_dict: TaskDict):
+        task_name: str = task_dict["name"]  # type: ignore
+        if task_name in self.tasks.keys():
+            raise RuntimeError(f"Multiple definitions for task {task_name} are found")
         self.tasks[task_name] = Task(
             name=task_name, dependencies=sorted(task_dict["dependencies"])
         )
@@ -51,33 +58,9 @@ class Tasks:
         return self.tasks
 
 
-def read_tasks() -> Tasks:
-    tasks_file = "tasks.yaml"
-    tasks_list = read_tasks_yaml(tasks_file)
-    tasks = Tasks()
-    for task_dict in tasks_list:
-        tasks.add(task_dict)
-    if missing_tasks := tasks.find_missing_tasks():
-        error_msg = get_missing_tasks_error_message(missing_tasks)
-        logger.error(error_msg)
-        raise RuntimeError(error_msg)
-    return tasks
-
-
-def read_tasks_yaml(tasks_file: str) -> list[dict[str, typing.Union[str, list[str]]]]:
-    with open(tasks_file, "r", encoding="utf-8") as f:
-        tasks = yaml.load(f, Loader=yaml.FullLoader)
-        try:
-            tasks_schema.validate(tasks)
-        except SchemaError as e:
-            logger.error(e)
-            raise RuntimeError(f"{tasks_file} has invalid format")
-    return tasks["tasks"]
-
-
 def get_missing_tasks_error_message(missing_tasks: dict[str, list[str]]) -> str:
     """Returns message about each missing task and tasks that depend on it.
-    Tasks are sorted by name, and dependencies of each task are also sorted."""
+    TaskStorage are sorted by name, and dependencies of each task are also sorted."""
     assert missing_tasks
     result = "Following tasks a missing:\n"
     lines: list[tuple[str, list[str]]] = []
