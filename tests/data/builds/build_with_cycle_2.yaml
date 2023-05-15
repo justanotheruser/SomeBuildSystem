@@ -1,0 +1,5 @@
+builds:
+- name: build_with_cycle_2
+  tasks:
+  - task_c
+  - task_d

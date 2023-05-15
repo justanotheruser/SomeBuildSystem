@@ -26,12 +26,13 @@ class DependencyCycleFinder:
         self.cycle_finished = False
         self._dfs(self.build_task_name)
         del self.tasks[self.build_task_name]
+        self.visited.remove(self.build_task_name)
         if self.cycle_finished:
             return self.cycle
         return None
 
-    def get_dependencies(self):
-        return self.visited.difference(set(self.build_task_name))
+    def get_dependencies(self) -> set[str]:
+        return self.visited
 
     def _dfs(self, task_name: str):
         self.visited.add(task_name)

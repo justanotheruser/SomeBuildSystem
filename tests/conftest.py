@@ -45,6 +45,10 @@ def data_file_in_cwd(src_file_path_list: list[str], dst_file_name_list: list[str
     for src_file_path, dst_file_name in zip(src_file_path_list, dst_file_name_list):
         src = f"tests/data/{src_file_path}"
         shutil.copyfile(src, dst_file_name)
-    yield
-    for dst_file_name in dst_file_name_list:
-        os.remove(dst_file_name)
+    try:
+        yield
+    except Exception:
+        pass
+    finally:
+        for dst_file_name in dst_file_name_list:
+            os.remove(dst_file_name)

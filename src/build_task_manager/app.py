@@ -99,7 +99,8 @@ def get_build_command(build_name):
         logger.error(e)
         click.echo(e)
         sys.exit(1)
-    cycle_finder = DependencyCycleFinder(builds[build_name]["tasks"], task_storage)
+    build = builds[build_name]
+    cycle_finder = DependencyCycleFinder(build["tasks"], task_storage)
     try:
         dependency_cycle = cycle_finder.find_cycle()
     except DependencyNotFoundError as e:
@@ -113,16 +114,16 @@ def get_build_command(build_name):
         cycle_visualization = " -> ".join(dependency_cycle)
         click.echo(f"Build has dependency cycle: {cycle_visualization}")
         sys.exit(1)
-    cycle_finder.get_dependencies()
-    """if not (build_name := tasks.get_task(build_name)):
-        warning_message = f"No such build: {build_name}"
-        logger.warning(warning_message)
-        click.echo(warning_message)
-        sys.exit(1)
-    dependencies = ", ".join(task.dependencies)
+    all_dependencies = cycle_finder.get_dependencies()
+    secondary_dependencies = all_dependencies.difference(build["tasks"])
+    ordered_dependencies = [
+        *sorted(build["tasks"]),
+        *sorted(list(secondary_dependencies)),
+    ]
+    dependencies_string = ", ".join(ordered_dependencies)
     click.echo(
-        "Task info:\n" f"* name: {task_name}\n" f"* dependencies: {dependencies}"
-    )"""
+        f"Build info:\n * name: {build['name']}\n * dependencies: {dependencies_string}"
+    )
 
 
 def setup_file_logger():
